@@ -15,10 +15,7 @@ To run this project locally, you will need:
 2. Docker Desktop (optional, for containerization)
 3. ODBC Driver 18 for SQL Server
 4. A .env file containing the following variables:
-  DB_USER=your_username
-  DB_PASSWORD=your_password
-  DB_SERVER=dist-6-505.uopnet.plymouth.ac.uk
-  DB_NAME=COMP2001_your_username
+  The username, password, the server and database name
 
 **Installation & Setup**
 1. Local Setup
@@ -47,3 +44,4 @@ Name: Tsang Pak Ho
 Student ID: 10967029
 University: University of Plymouth
 Module: COMP2001 Information Management & Retrieval
+
