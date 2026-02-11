@@ -1,41 +1,42 @@
-from flask import Flask
+import connexion
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from dotenv import load_dotenv
 import os
 
-# 1. Load Environment Variables (Security)
+#1. Load security variables from .env
 load_dotenv()
 
-# 2. Initialize Flask App
-app = Flask(__name__)
+# 2. Create the Connexion application instance 
+# specification_dir tells it where to look for swagger.yml 
+connex_app = connexion.App(__name__, specification_dir='./')
 
-# 3. Database Configuration
-# We fetch these from the .env file so they aren't hardcoded
+# 3. Get the underlying Flask app instance
+app = connex_app.app
+
+# 4. Database Configuration (ODBC Driver 18)
 user = os.getenv('DB_USERNAME')
 password = os.getenv('DB_PASSWORD')
 server = os.getenv('DB_SERVER')
 database = os.getenv('DB_DATABASE')
 
-# Configure the connection string for ODBC Driver 18
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     f"mssql+pyodbc://{user}:{password}@{server}/{database}"
     "?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
 )
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Performance boost 
 
-# 4. Initialize Plugins
+# 5. Initialize Plugins 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+import models
 
-# 5. Base Route (Sanity Check)
+# 6. Load the Swagger definition 
+connex_app.add_api("swagger.yml")
+
 @app.route('/')
 def home():
-    return {
-        "message": "Trail Service API is running",
-        "status": "Connected to Database"
-    }
+    return "<h1>Trail Service API</h1><p>Documentation available at /api/ui</p>"
 
-# 6. Start the Server
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    connex_app.run(host='0.0.0.0', port=5000, debug=True)
