@@ -39,4 +39,4 @@ def home():
     return "<h1>Trail Service API</h1><p>Documentation available at /api/ui</p>"
 
 if __name__ == '__main__':
-    connex_app.run(host='0.0.0.0', port=5000, debug=True)
+    connex_app.run(host='0.0.0.0', port=5000)

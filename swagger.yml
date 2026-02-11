@@ -1,0 +1,57 @@
+openapi: 3.0.0
+info:
+  title: Trail Service API
+  description: API for COMP2001 CW2
+  version: 1.0.0
+
+paths:
+  /health:
+    get:
+      operationId: "app.home"
+      summary: "Check API health"
+      responses:
+        "200":
+          description: "API is running"
+
+  /trails:
+    get:
+      operationId: "trails.read_all"
+      tags:
+        - "Trails"
+      summary: "Read the list of all trails"
+      responses:
+        "200":
+          description: "Successfully read trail list"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Trail"
+
+components:
+  schemas:
+    Trail:
+      type: "object"
+      properties:
+        TrailId:
+          type: "integer"
+        TrailName:
+          type: "string"
+        Length:
+          type: "number"
+          format: "float"
+        ElevationGain:
+          type: "number"
+          format: "float"
+        EstimatedTime:
+          type: "number"
+          format: "float"
+        RouteType:
+          type: "string"
+        Difficulty:
+          type: "string"
+        trailDescription:
+          type: "string"
+        OwnerId:
+          type: "integer"
