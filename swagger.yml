@@ -56,8 +56,45 @@ paths:
         "401":
           description: "Authentication failed"
 
-  # New path for operations on a specific trail ID
   /trails/{TrailId}:
+    # 3. PUT Operation (Update)
+    put:
+      operationId: "trails.update"
+      tags:
+        - "Trails"
+      summary: "Update a specific trail (Owner only)"
+      parameters:
+        - name: TrailId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-Email
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: X-Password
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Trail"
+      responses:
+        "200":
+          description: "Trail updated successfully"
+        "401":
+          description: "Unauthorized - Authentication failed"
+        "403":
+          description: "Forbidden - You do not own this trail"
+        "404":
+          description: "Trail not found"
+
+    # 4. DELETE Operation
     delete:
       operationId: "trails.delete"
       tags:
