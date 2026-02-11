@@ -14,6 +14,7 @@ paths:
           description: "API is running"
 
   /trails:
+    # 1. GET Operation (Read All)
     get:
       operationId: "trails.read_all"
       tags:
@@ -28,6 +29,34 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Trail"
+
+    # 2. POST Operation (Create) 
+    post:
+      operationId: "trails.create"
+      tags:
+        - "Trails"
+      summary: "Create a new trail"
+      parameters:
+        - in: header
+          name: X-Email
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: X-Password
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Trail"
+      responses:
+        "201":
+          description: "Trail created successfully"
+        "401":
+          description: "Authentication failed"
 
 components:
   schemas:

@@ -1,42 +1,45 @@
 import connexion
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
-from dotenv import load_dotenv
+from flask import render_template
 import os
+from dotenv import load_dotenv
+from pathlib import Path
+from extensions import db, ma
 
-#1. Load security variables from .env
-load_dotenv()
+# 1. Setup Environment Loading
+basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(os.path.join(basedir, '.env'))
 
-# 2. Create the Connexion application instance 
-# specification_dir tells it where to look for swagger.yml 
+# 2. Get variables with hardcoded fallbacks for your specific setup
+# This ensures it works NOW, even if your .env is still being tricky
+user = os.getenv('DB_USER') or 'HK_PTsang'
+server = os.getenv('DB_SERVER') or 'dist-6-505.uopnet.plymouth.ac.uk'
+database = os.getenv('DB_NAME') or 'COMP2001_HK_PTsang'
+# Replace 'YOUR_REAL_PASSWORD' with the actual password from your screenshot
+password = os.getenv('DB_PASSWORD') or 'YOUR_REAL_PASSWORD' 
+
+print(f"--- DEBUG: Connecting as User: {user} to Server: {server} ---")
+
+# 3. Create the Connexion application
 connex_app = connexion.App(__name__, specification_dir='./')
-
-# 3. Get the underlying Flask app instance
 app = connex_app.app
 
-# 4. Database Configuration (ODBC Driver 18)
-user = os.getenv('DB_USERNAME')
-password = os.getenv('DB_PASSWORD')
-server = os.getenv('DB_SERVER')
-database = os.getenv('DB_DATABASE')
-
+# 4. Configure the Database
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     f"mssql+pyodbc://{user}:{password}@{server}/{database}"
     "?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
 )
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Performance boost 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# 5. Initialize Plugins 
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
-import models
+# 5. Initialize extensions
+db.init_app(app)
+ma.init_app(app)
 
-# 6. Load the Swagger definition 
-connex_app.add_api("swagger.yml")
+# 6. Add API and Routes
+connex_app.add_api("swagger.yml", options={"swagger_url": "/ui"})
 
-@app.route('/')
+@app.route("/")
 def home():
-    return "<h1>Trail Service API</h1><p>Documentation available at /api/ui</p>"
+    return render_template("home.html")
 
 if __name__ == '__main__':
     connex_app.run(host='0.0.0.0', port=5000)
