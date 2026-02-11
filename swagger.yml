@@ -14,7 +14,6 @@ paths:
           description: "API is running"
 
   /trails:
-    # 1. GET Operation (Read All)
     get:
       operationId: "trails.read_all"
       tags:
@@ -30,7 +29,6 @@ paths:
                 items:
                   $ref: "#/components/schemas/Trail"
 
-    # 2. POST Operation (Create) 
     post:
       operationId: "trails.create"
       tags:
@@ -58,6 +56,39 @@ paths:
         "401":
           description: "Authentication failed"
 
+  # New path for operations on a specific trail ID
+  /trails/{TrailId}:
+    delete:
+      operationId: "trails.delete"
+      tags:
+        - "Trails"
+      summary: "Delete a specific trail (Owner only)"
+      parameters:
+        - name: TrailId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - in: header
+          name: X-Email
+          schema:
+            type: string
+          required: true
+        - in: header
+          name: X-Password
+          schema:
+            type: string
+          required: true
+      responses:
+        "204":
+          description: "Trail deleted successfully"
+        "401":
+          description: "Unauthorized - Authentication failed"
+        "403":
+          description: "Forbidden - You do not own this trail"
+        "404":
+          description: "Trail not found"
+
 components:
   schemas:
     Trail:
@@ -83,4 +114,20 @@ components:
         trailDescription:
           type: "string"
         OwnerId:
+          type: "integer"
+        locations:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/LocationPoint"
+
+    LocationPoint:
+      type: "object"
+      properties:
+        Latitude:
+          type: "number"
+          format: "float"
+        Longitude:
+          type: "number"
+          format: "float"
+        PointOrder:
           type: "integer"
